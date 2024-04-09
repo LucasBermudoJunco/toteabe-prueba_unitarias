@@ -192,8 +192,6 @@ public class Connect4TDDSpec {
             // (porque si se insertan en todas las columnas, se alcanzará el fin de la partida
             // antes de terminar esta comprobación)
             for(int g=0; g<cantColumnasInsertadas*2; g+=2){
-                int columnaInsertada;
-
                 for(int f=0; f<6; f++){
                     tested.putDiscInColumn(g);
 
