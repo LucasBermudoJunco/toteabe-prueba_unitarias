@@ -20,6 +20,11 @@ public class Connect4TDDSpec {
 
     private OutputStream output;
 
+    // Atributos para todos los tests
+    private static int discosParaGanar = 4;
+    private static int cantFilas = 6;
+    private static int cantColumnas = 7;
+
     @BeforeEach
     public void beforeEachTest() {
         output = new ByteArrayOutputStream();
@@ -392,6 +397,95 @@ public class Connect4TDDSpec {
     @Test
     public void whenNoDiscCanBeIntroducedTheGamesIsFinished() {
 
+        // En este caso solo realizamos 2 comprobaciones debido a la forma en que se va a llenar el tablero
+        // para simular la partida (en la cual van a haber 2 lugares de comienzo: la columna 0 y la 1)
+        int cantComprob = 2;
+
+        // Comprobaciones
+        for(int h=0; h<cantComprob; h++){
+
+            // WHEN
+
+            // Reinicialización del objeto Connect4TDD en cada iteración mayor a la primera
+            if(h>0){
+                tested = new Connect4TDD(new PrintStream(output));
+            }
+
+            // DO
+
+            // Llenado del tablero de tal forma se llene por completo antes de que ningún jugador gane
+            int primeraColumna;
+
+            if(h==0){
+                // Queremos que se llene de la siguiente forma:
+                //   XOXOXOO
+                //   XOXOXOX
+                //   OXOXOXO
+                //   XXOXOXO
+                //   XOXOXOO
+                //   XOXOXOX
+                for(int i=0; i<(cantFilas*cantColumnas); i++){
+                    if(i<=5){
+                        tested.putDiscInColumn(i);
+                    } else if(i>=6 && i<=11){
+                        tested.putDiscInColumn(i-6);
+                    } else if(i>=12 && i<=13){
+                        tested.putDiscInColumn(6);
+                    } else if(i>=14 && i<=19) {
+                        // Cambio de la columna 0 a la columna 1
+                        tested.putDiscInColumn(i - 13);
+                    } else if(i>=20 && i<=25){
+                        tested.putDiscInColumn(i - 19);
+                    } else if(i>=26 && i<=27){
+                        tested.putDiscInColumn(0);
+                    } else if(i>=28 && i<=33){
+                        // Vuelta a la columna 0
+                        tested.putDiscInColumn(i-28);
+                    } else if(i>=34 && i<=39){
+                        tested.putDiscInColumn(i-34);
+                    } else{
+                        tested.putDiscInColumn(6);
+                    }
+                }
+            } else{
+                // Queremos que se llene de la siguiente forma:
+                //   OXOXOXO
+                //   XXOXOXO
+                //   XOXOXOO
+                //   XOXOXOX
+                //   OXOXOXO
+                //   XXOXOXO
+                for(int i=0; i<(cantFilas*cantColumnas); i++){
+                    if(i<=5){
+                        tested.putDiscInColumn(i+1);
+                    } else if(i>=6 && i<=11){
+                        tested.putDiscInColumn(i-5);
+                    } else if(i>=12 && i<=13){
+                        tested.putDiscInColumn(0);
+                    } else if(i>=14 && i<=19) {
+                        // Cambio de la columna 1 a la columna 0
+                        tested.putDiscInColumn(i - 14);
+                    } else if(i>=20 && i<=25){
+                        tested.putDiscInColumn(i - 20);
+                    } else if(i>=26 && i<=27){
+                        tested.putDiscInColumn(6);
+                    } else if(i>=28 && i<=33){
+                        // Vuelta a la columna 1
+                        tested.putDiscInColumn(i-27);
+                    } else if(i>=34 && i<=39){
+                        tested.putDiscInColumn(i-33);
+                    } else{
+                        tested.putDiscInColumn(0);
+                    }
+                }
+            }
+
+            // THEN
+
+            assertThat(tested.isFinished()).isTrue();
+
+        }
+
     }
 
     /*
@@ -403,7 +497,6 @@ public class Connect4TDDSpec {
     public void when4VerticalDiscsAreConnectedThenThatPlayerWins() {
 
         int cantComprob = 100;
-        int discosParaGanar = 4;
 
         // Comprobaciones
         for(int h=0; h<cantComprob; h++){
@@ -482,7 +575,6 @@ public class Connect4TDDSpec {
     public void when4HorizontalDiscsAreConnectedThenThatPlayerWins() {
 
         int cantComprob = 100;
-        int discosParaGanar = 4;
 
         // Comprobaciones
         for(int h=0; h<cantComprob; h++){
@@ -556,13 +648,171 @@ public class Connect4TDDSpec {
      * in a straight diagonal line then that player wins
      */
 
+    /*
+     * Diagonal desde abajo-izquierda hasta arriba-derecha
+     */
     @Test
     public void when4Diagonal1DiscsAreConnectedThenThatPlayerWins() {
 
+        int cantComprob = 100;
+
+        // Comprobaciones
+        for(int h=0; h<cantComprob; h++){
+
+            // WHEN
+
+            // Reinicialización del objeto Connect4TDD en cada iteración mayor a la primera
+            if(h>0){
+                tested = new Connect4TDD(new PrintStream(output));
+            }
+
+            // Elección al azar del jugador que queremos que gane en esta comprobación
+            String jugadorGanador="";
+            int eleccion = (int)(Math.random()*2);
+            switch(eleccion){
+                case 0: jugadorGanador = "R"; break;
+                default: jugadorGanador = "G"; break;
+            }
+
+            // Elección al azar de una columna del tablero a la que va a jugar
+            // el jugador que queremos que gane (dicho jugador va a jugar a esa columna
+            // y a las 3 columnas a la derecha de esta columna, por lo que la primera
+            // columna de estas 4 columnas tiene que estar entre la 0 y la 3)
+            int columnaDelJugadorGanador = (int)(Math.random()*4);
+
+            // Creación de una primera tirada en caso de que el jugador que queramos
+            // que gane sea el segundo jugador
+            int columnaDeLaPrimeraTirada = 0;
+            if(jugadorGanador.equals("G")) {
+                // Elección al azar de una columna del tablero a la que va a jugar
+                // el jugador que queremos que pierda en su primera tirada
+                // (excluyendo de las columnas las 4 columnas a las que va a jugar
+                // el jugador que queremos que gane)
+                do {
+                    columnaDeLaPrimeraTirada = (int) (Math.random() * 7);
+                } while (columnaDeLaPrimeraTirada >= columnaDelJugadorGanador &&
+                        columnaDeLaPrimeraTirada <= columnaDelJugadorGanador+3);
+            }
+
+            // DO
+
+            // Ajuste de la partida en caso de que el jugador que queramos que gane
+            // sea el segundo jugador
+            if(jugadorGanador.equals("G")){
+                // Tirada del primer jugador
+                tested.putDiscInColumn(columnaDeLaPrimeraTirada);
+            }
+
+            // Jugada 11 veces para que se construya la diagonal del jugador ganador
+            for(int i=0; i<11; i++){
+                // Alternado entre las columnas para que el jugador ganador
+                // construya su diagonal ganadora de esta forma:
+                //      X
+                //    OXO
+                //    XOX
+                //   XOXO
+                if(i==0){
+                    tested.putDiscInColumn(columnaDelJugadorGanador);
+                } else if(i>=1 && i<=3){
+                    tested.putDiscInColumn(columnaDelJugadorGanador+1);
+                } else if(i>=4 && i<=6){
+                    tested.putDiscInColumn(columnaDelJugadorGanador+2);
+                } else {
+                    tested.putDiscInColumn(columnaDelJugadorGanador+3);
+                }
+            }
+
+            // THEN
+
+            assertThat(tested.getWinner()).isEqualTo(jugadorGanador);
+
+        }
+
     }
 
+    /*
+     * Diagonal desde arriba-izquierda hasta abajo-derecha
+     */
     @Test
     public void when4Diagonal2DiscsAreConnectedThenThatPlayerWins() {
+
+        int cantComprob = 100;
+
+        // Comprobaciones
+        for(int h=0; h<cantComprob; h++){
+
+            // WHEN
+
+            // Reinicialización del objeto Connect4TDD en cada iteración mayor a la primera
+            if(h>0){
+                tested = new Connect4TDD(new PrintStream(output));
+            }
+
+            // Elección al azar del jugador que queremos que gane en esta comprobación
+            String jugadorGanador="";
+            int eleccion = (int)(Math.random()*2);
+            switch(eleccion){
+                case 0: jugadorGanador = "R"; break;
+                default: jugadorGanador = "G"; break;
+            }
+
+            // Elección al azar de una columna del tablero a la que va a jugar
+            // el jugador que queremos que gane (dicho jugador va a jugar a esa columna
+            // y a las 3 columnas a la derecha de esta columna, por lo que la primera
+            // columna de estas 4 columnas tiene que estar entre la 0 y la 3)
+            int columnaDelJugadorGanador = (int)(Math.random()*4);
+
+            // En este caso, debe empezar a jugar a las columnas correctas
+            // el jugador que queremos que pierda
+            // (al contrario que en los métodos anteriores)
+
+            // Creación de una primera tirada en caso de que el jugador que queramos
+            // que gane sea el primer jugador
+            int columnaDeLaPrimeraTirada = 0;
+            if(jugadorGanador.equals("R")) {
+                // Elección al azar de una columna del tablero a la que va a jugar
+                // el jugador que queremos que pierda en su primera tirada
+                // (excluyendo de las columnas las 4 columnas a las que va a jugar
+                // el jugador que queremos que gane)
+                do {
+                    columnaDeLaPrimeraTirada = (int) (Math.random() * 7);
+                } while (columnaDeLaPrimeraTirada >= columnaDelJugadorGanador &&
+                        columnaDeLaPrimeraTirada <= columnaDelJugadorGanador+3);
+            }
+
+            // DO
+
+            // Ajuste de la partida en caso de que el jugador que queramos que gane
+            // sea el primer jugador
+            if(jugadorGanador.equals("R")){
+                // Tirada del primer jugador
+                tested.putDiscInColumn(columnaDeLaPrimeraTirada);
+            }
+
+            // Jugada 12 veces para que se construya la diagonal del jugador ganador
+            for(int i=0; i<12; i++){
+                // Alternado entre las columnas para que el jugador ganador
+                // construya su diagonal ganadora de esta forma:
+                //   X
+                //   OX
+                //   XOX
+                //   OXOX
+                if(i<=4){
+                    tested.putDiscInColumn(columnaDelJugadorGanador);
+                } else if(i>=5 && i<=7){
+                    tested.putDiscInColumn(columnaDelJugadorGanador+1);
+                } else if(i>=8 && i<=10){
+                    tested.putDiscInColumn(columnaDelJugadorGanador+2);
+                } else {
+                    tested.putDiscInColumn(columnaDelJugadorGanador+3);
+                }
+            }
+
+            // THEN
+
+            assertThat(tested.getWinner()).isEqualTo(jugadorGanador);
+
+        }
 
     }
 
