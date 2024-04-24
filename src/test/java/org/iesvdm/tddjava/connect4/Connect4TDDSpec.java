@@ -357,12 +357,61 @@ public class Connect4TDDSpec {
     @Test
     public void whenAskedForCurrentPlayerTheOutputNotice() {
 
+        String currentPlayer = tested.getCurrentPlayer();
 
+        String mensajeOutput = String.format("Player %s turn%n", currentPlayer);
+
+        assertThat(output.toString()).isEqualTo(mensajeOutput);
 
     }
 
     @Test
     public void whenADiscIsIntroducedTheBoardIsPrinted() {
+
+        // 1º turno
+        tested.putDiscInColumn(0);
+
+        System.out.println(output.toString());
+
+        String expected1 = """
+                | | | | | | | |
+                | | | | | | | |
+                | | | | | | | |
+                | | | | | | | |
+                | | | | | | | |
+                |R| | | | | | |
+                """;
+
+        assertThat(output.toString().replaceAll("\r", "")).isEqualTo(expected1);
+
+//        // Otra forma de ver el salto de línea ´´\r\n`` en Windows
+//
+//        String expected1 = """
+//                | | | | | | | |\r
+//                | | | | | | | |\r
+//                | | | | | | | |\r
+//                | | | | | | | |\r
+//                | | | | | | | |\r
+//                |R| | | | | | |\r
+//                """;
+//
+//        assertThat(output.toString()).isEqualTo(expected1);
+
+        // 2º turno
+        tested.putDiscInColumn(0);
+
+        System.out.println(output.toString());
+
+        String expected2 = """
+                | | | | | | | |
+                | | | | | | | |
+                | | | | | | | |
+                | | | | | | | |
+                |G| | | | | | |
+                |R| | | | | | |
+                """;
+
+        assertThat(output.toString().replaceAll("\r", "").replace(expected1,"")).isEqualTo(expected2);
 
     }
 
