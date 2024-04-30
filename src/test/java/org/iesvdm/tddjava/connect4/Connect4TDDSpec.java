@@ -371,8 +371,6 @@ public class Connect4TDDSpec {
         // 1º turno
         tested.putDiscInColumn(0);
 
-        System.out.println(output.toString());
-
         String expected1 = """
                 | | | | | | | |
                 | | | | | | | |
@@ -383,6 +381,10 @@ public class Connect4TDDSpec {
                 """;
 
         assertThat(output.toString().replaceAll("\r", "")).isEqualTo(expected1);
+
+        // Impresión del contenido del output
+        System.out.println("1ª jugada:");
+        System.out.println(output.toString());
 
 //        // Otra forma de ver el salto de línea ´´\r\n`` en Windows
 //
@@ -400,8 +402,6 @@ public class Connect4TDDSpec {
         // 2º turno
         tested.putDiscInColumn(0);
 
-        System.out.println(output.toString());
-
         String expected2 = """
                 | | | | | | | |
                 | | | | | | | |
@@ -412,6 +412,10 @@ public class Connect4TDDSpec {
                 """;
 
         assertThat(output.toString().replaceAll("\r", "").replace(expected1,"")).isEqualTo(expected2);
+
+        // Impresión del contenido del output
+        System.out.println("2ª jugada:");
+        System.out.println(output.toString().replaceAll("\r", "").replace(expected1,""));
 
     }
 
